@@ -1,0 +1,268 @@
+// System constants and configuration values
+
+// Attendance states
+const ATTENDANCE_STATES = {
+  NOT_PUNCHED: 'NOT_PUNCHED',
+  PUNCHED_IN: 'PUNCHED_IN',
+  ON_BREAK: 'ON_BREAK',
+  PUNCHED_OUT: 'PUNCHED_OUT',
+  PENDING_APPROVAL: 'PENDING_APPROVAL'
+};
+
+// Valid state transitions
+const VALID_TRANSITIONS = {
+  [ATTENDANCE_STATES.NOT_PUNCHED]: [ATTENDANCE_STATES.PUNCHED_IN],
+  [ATTENDANCE_STATES.PUNCHED_IN]: [
+    ATTENDANCE_STATES.ON_BREAK,
+    ATTENDANCE_STATES.PUNCHED_OUT,
+    ATTENDANCE_STATES.PENDING_APPROVAL
+  ],
+  [ATTENDANCE_STATES.ON_BREAK]: [ATTENDANCE_STATES.PUNCHED_IN],
+  [ATTENDANCE_STATES.PUNCHED_OUT]: [ATTENDANCE_STATES.PUNCHED_IN],
+  [ATTENDANCE_STATES.PENDING_APPROVAL]: [
+    ATTENDANCE_STATES.PUNCHED_IN,
+    ATTENDANCE_STATES.NOT_PUNCHED
+  ]
+};
+
+// Attendance status types
+const ATTENDANCE_STATUS = {
+  PRESENT: 'PRESENT',
+  ABSENT: 'ABSENT',
+  HALF_DAY: 'HALF_DAY',
+  LATE: 'LATE',
+  EARLY_EXIT: 'EARLY_EXIT',
+  HOLIDAY: 'HOLIDAY',
+  WEEKEND: 'WEEKEND',
+  ON_LEAVE: 'ON_LEAVE',
+  PENDING_APPROVAL: 'PENDING_APPROVAL'
+};
+
+// Punch types
+const PUNCH_TYPES = {
+  IN: 'IN',
+  OUT: 'OUT',
+  BREAK_START: 'BREAK_START',
+  BREAK_END: 'BREAK_END'
+};
+
+// Punch sources
+const PUNCH_SOURCES = {
+  WEB: 'WEB',
+  MOBILE: 'MOBILE',
+  OFFLINE: 'OFFLINE',
+  API: 'API',
+  SYSTEM: 'SYSTEM'
+};
+
+// Approval statuses
+const APPROVAL_STATUS = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  ESCALATED: 'ESCALATED',
+  CANCELLED: 'CANCELLED'
+};
+
+// Request types
+const REQUEST_TYPES = {
+  INVALID_LOCATION: 'INVALID_LOCATION',
+  OFFLINE_SYNC: 'OFFLINE_SYNC',
+  MISSED_PUNCH: 'MISSED_PUNCH',
+  REGULARIZATION: 'REGULARIZATION',
+  OVERTIME: 'OVERTIME',
+  LEAVE: 'LEAVE',
+  WORK_FROM_HOME: 'WORK_FROM_HOME'
+};
+
+// User statuses
+const USER_STATUS = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  TERMINATED: 'TERMINATED',
+  ON_LEAVE: 'ON_LEAVE'
+};
+
+// Shift types
+const SHIFT_TYPES = {
+  FIXED: 'Fixed',
+  FLEXIBLE: 'Flexible',
+  ROTATIONAL: 'Rotational',
+  NIGHT: 'Night'
+};
+
+// Break types
+const BREAK_TYPES = {
+  PAID: 'PAID',
+  UNPAID: 'UNPAID'
+};
+
+// Break statuses
+const BREAK_STATUS = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  AUTO_CLOSED: 'AUTO_CLOSED',
+  CANCELLED: 'CANCELLED'
+};
+
+// Action types for audit logs
+const ACTION_TYPES = {
+  // User actions
+  USER_CREATE: 'USER_CREATE',
+  USER_UPDATE: 'USER_UPDATE',
+  USER_DELETE: 'USER_DELETE',
+  USER_LOGIN: 'USER_LOGIN',
+  USER_LOGOUT: 'USER_LOGOUT',
+  USER_FAILED_LOGIN: 'USER_FAILED_LOGIN',
+  
+  // Attendance actions
+  PUNCH_IN: 'PUNCH_IN',
+  PUNCH_OUT: 'PUNCH_OUT',
+  BREAK_START: 'BREAK_START',
+  BREAK_END: 'BREAK_END',
+  PUNCH_EDIT: 'PUNCH_EDIT',
+  ATTENDANCE_OVERRIDE: 'ATTENDANCE_OVERRIDE',
+  
+  // Approval actions
+  REQUEST_CREATE: 'REQUEST_CREATE',
+  REQUEST_APPROVE: 'REQUEST_APPROVE',
+  REQUEST_REJECT: 'REQUEST_REJECT',
+  REQUEST_ESCALATE: 'REQUEST_ESCALATE',
+  
+  // Admin actions
+  ACCESS_REVOKE: 'ACCESS_REVOKE',
+  ACCESS_RESTORE: 'ACCESS_RESTORE',
+  POLICY_CHANGE: 'POLICY_CHANGE',
+  SHIFT_CHANGE: 'SHIFT_CHANGE',
+  GEOFENCE_CHANGE: 'GEOFENCE_CHANGE',
+  
+  // Payroll actions
+  PAYROLL_LOCK: 'PAYROLL_LOCK',
+  PAYROLL_UNLOCK: 'PAYROLL_UNLOCK',
+  PAYROLL_EXPORT: 'PAYROLL_EXPORT',
+  
+  // System actions
+  SYSTEM_CONFIG: 'SYSTEM_CONFIG',
+  BACKUP_CREATE: 'BACKUP_CREATE',
+  BACKUP_RESTORE: 'BACKUP_RESTORE'
+};
+
+// Notification types
+const NOTIFICATION_TYPES = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  SUCCESS: 'SUCCESS',
+  ERROR: 'ERROR',
+  APPROVAL_REQUIRED: 'APPROVAL_REQUIRED'
+};
+
+// Notification channels
+const NOTIFICATION_CHANNELS = {
+  EMAIL: 'EMAIL',
+  SMS: 'SMS',
+  IN_APP: 'IN_APP',
+  PUSH: 'PUSH'
+};
+
+// Email templates
+const EMAIL_TEMPLATES = {
+  WELCOME: 'welcome',
+  PASSWORD_RESET: 'password_reset',
+  PUNCH_REMINDER: 'punch_reminder',
+  APPROVAL_REQUEST: 'approval_request',
+  APPROVAL_STATUS: 'approval_status',
+  LATE_ALERT: 'late_alert',
+  MISSED_PUNCH: 'missed_punch',
+  PAYROLL_LOCKED: 'payroll_locked',
+  ACCESS_REVOKED: 'access_revoked'
+};
+
+// Default values
+const DEFAULTS = {
+  GRACE_PERIOD_MINUTES: 15,
+  LATE_THRESHOLD_MINUTES: 30,
+  HALF_DAY_THRESHOLD_HOURS: 4,
+  BREAK_DURATION_MINUTES: 60,
+  MAX_BREAK_MINUTES: 120,
+  OVERTIME_RATE: 1.5,
+  DOUBLE_OVERTIME_RATE: 2.0,
+  GEO_FENCE_RADIUS_METERS: 100,
+  LOCATION_ACCURACY_THRESHOLD: 50,
+  OFFLINE_SYNC_DELAY_MINUTES: 15,
+  SESSION_TIMEOUT_HOURS: 8,
+  MAX_LOGIN_ATTEMPTS: 5,
+  ACCOUNT_LOCK_MINUTES: 30,
+  PASSWORD_RESET_EXPIRY_HOURS: 24
+};
+
+// Validation constants
+const VALIDATION = {
+  MIN_PASSWORD_LENGTH: 8,
+  MAX_PASSWORD_LENGTH: 128,
+  PHONE_REGEX: /^\+?[1-9]\d{1,14}$/,
+  EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  EMPLOYEE_ID_REGEX: /^[A-Z0-9]{3,20}$/,
+  LATITUDE_RANGE: { min: -90, max: 90 },
+  LONGITUDE_RANGE: { min: -180, max: 180 }
+};
+
+// Pagination defaults
+const PAGINATION = {
+  DEFAULT_PAGE: 1,
+  DEFAULT_LIMIT: 20,
+  MAX_LIMIT: 100
+};
+
+// Cache TTL (in seconds)
+const CACHE_TTL = {
+  USER: 3600,        // 1 hour
+  SHIFT: 86400,      // 24 hours
+  POLICY: 3600,      // 1 hour
+  GEOFENCE: 3600,    // 1 hour
+  ATTENDANCE: 900,   // 15 minutes
+  SESSION: 28800     // 8 hours
+};
+
+// File upload limits
+const UPLOAD_LIMITS = {
+  PHOTO_MAX_SIZE: 5 * 1024 * 1024,      // 5MB
+  DOCUMENT_MAX_SIZE: 10 * 1024 * 1024,   // 10MB
+  BULK_CSV_MAX_SIZE: 50 * 1024 * 1024,   // 50MB
+  ALLOWED_PHOTO_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+  ALLOWED_DOCUMENT_TYPES: ['application/pdf', 'image/jpeg', 'image/png']
+};
+
+// Rate limiting configurations
+const RATE_LIMITS = {
+  PUBLIC: { windowMs: 15 * 60 * 1000, max: 100 },    // 100 requests per 15 minutes
+  AUTHENTICATED: { windowMs: 15 * 60 * 1000, max: 1000 }, // 1000 requests per 15 minutes
+  ATTENDANCE: { windowMs: 1 * 60 * 1000, max: 30 },   // 30 requests per minute
+  ADMIN: { windowMs: 15 * 60 * 1000, max: 500 },      // 500 requests per 15 minutes
+  LOGIN: { windowMs: 15 * 60 * 1000, max: 5 }         // 5 attempts per 15 minutes
+};
+
+// Export all constants
+module.exports = {
+  ATTENDANCE_STATES,
+  VALID_TRANSITIONS,
+  ATTENDANCE_STATUS,
+  PUNCH_TYPES,
+  PUNCH_SOURCES,
+  APPROVAL_STATUS,
+  REQUEST_TYPES,
+  USER_STATUS,
+  SHIFT_TYPES,
+  BREAK_TYPES,
+  BREAK_STATUS,
+  ACTION_TYPES,
+  NOTIFICATION_TYPES,
+  NOTIFICATION_CHANNELS,
+  EMAIL_TEMPLATES,
+  DEFAULTS,
+  VALIDATION,
+  PAGINATION,
+  CACHE_TTL,
+  UPLOAD_LIMITS,
+  RATE_LIMITS
+};
