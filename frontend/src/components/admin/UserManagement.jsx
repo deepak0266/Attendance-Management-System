@@ -161,7 +161,15 @@ const UserManagement = () => {
       resetForm();
       fetchUsers();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to save user');
+      const data = error.response?.data;
+      if (data?.details) {
+        const messages = Object.values(data.details).join(', ');
+        toast.error(`Validation failed: ${messages}`);
+      } else if (data?.errors && Array.isArray(data.errors)) {
+        toast.error(data.errors[0].msg);
+      } else {
+        toast.error(data?.error || 'Failed to save user');
+      }
     }
   };
 
