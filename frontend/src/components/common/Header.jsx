@@ -99,14 +99,15 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
   return (
     <header className="header">
       <div className="d-flex align-center gap-2">
-        <button className="menu-toggle" onClick={toggleSidebar}>
+        <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle sidebar">
           <FaBars />
         </button>
         
-        <h2>Attendance Management System</h2>
+        <h2 className="header-title">Attendance Management System</h2>
+        <h2 className="header-title-short">AMS</h2>
         
         {user && (
-          <span className={`badge ${roleBadge.class}`}>
+          <span className={`badge ${roleBadge.class} hide-mobile-sm`}>
             {roleBadge.text}
           </span>
         )}
@@ -120,6 +121,7 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
           <button 
             className="btn btn-secondary btn-icon"
             onClick={() => setShowNotifications(!showNotifications)}
+            aria-label="Notifications"
           >
             <FaBell />
             {unreadCount > 0 && (
@@ -180,11 +182,11 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
         {/* Profile Dropdown */}
         <div className="profile-wrapper">
           <button 
-            className="btn btn-secondary"
+            className="btn btn-secondary profile-btn"
             onClick={() => setShowDropdown(!showDropdown)}
           >
             <FaUserCircle />
-            <span>{user?.full_name?.split(' ')[0] || 'User'}</span>
+            <span className="profile-name">{user?.full_name?.split(' ')[0] || 'User'}</span>
           </button>
           
           <AnimatePresence>
@@ -222,6 +224,13 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
       </div>
       
       <style jsx>{`
+        .header-title {
+          display: block;
+        }
+        .header-title-short {
+          display: none;
+        }
+
         .notification-wrapper,
         .profile-wrapper {
           position: relative;
@@ -303,6 +312,7 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
         
         .notification-content {
           flex: 1;
+          min-width: 0;
         }
         
         .notification-title {
@@ -314,6 +324,11 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
           font-size: 13px;
           color: var(--text-secondary);
           margin-bottom: 5px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
         }
         
         .notification-time {
@@ -350,11 +365,74 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
         .dropdown-item:hover {
           background: var(--hover-bg);
         }
+
+        .profile-btn {
+          gap: 6px;
+        }
+
+        .profile-name {
+          max-width: 100px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .hide-mobile-sm {
+          display: inline-flex;
+        }
         
+        @media (max-width: 768px) {
+          .header-title {
+            display: none;
+          }
+          .header-title-short {
+            display: block;
+            font-size: 1.2rem !important;
+          }
+
+          .notification-dropdown {
+            position: fixed;
+            top: auto;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            border-radius: 16px 16px 0 0;
+            margin-top: 0;
+            max-height: 70vh;
+          }
+
+          .notification-list {
+            max-height: 50vh;
+          }
+          
+          .profile-name {
+            display: none;
+          }
+
+          .hide-mobile-sm {
+            display: none;
+          }
+
+          .dropdown-menu {
+            position: fixed;
+            top: auto;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            min-width: 100%;
+            border-radius: 16px 16px 0 0;
+            margin-top: 0;
+          }
+        }
+
         @media (max-width: 576px) {
           .notification-dropdown {
-            width: 300px;
-            right: -50px;
+            max-height: 80vh;
+          }
+
+          .notification-item {
+            padding: 12px 14px;
           }
         }
       `}</style>

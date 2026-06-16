@@ -879,88 +879,425 @@ body {
 .shadow { box-shadow: var(--card-shadow); }
 .shadow-lg { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 
-/* Responsive */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* --- Large Tablets / Small Desktops (≤1200px) --- */
 @media (max-width: 1200px) {
   .grid-4 { grid-template-columns: repeat(3, 1fr); }
+  .grid-5 { grid-template-columns: repeat(3, 1fr); }
+  .grid-6 { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* --- Tablets (≤992px) --- */
 @media (max-width: 992px) {
-  .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-5 { grid-template-columns: repeat(2, 1fr); }
+  .grid-6 { grid-template-columns: repeat(2, 1fr); }
+
+  /* Sidebar: slide off-screen, overlay on open */
   .sidebar {
     transform: translateX(-100%);
+    box-shadow: none;
   }
   .sidebar.open {
     transform: translateX(0);
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
   }
+
+  /* Main content: remove sidebar margin */
   .main-content {
     margin-left: 0;
   }
+
+  /* Header: compact */
   .header {
-    padding: 12px 20px;
+    padding: 12px 16px;
   }
   .header h2 {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+  }
+
+  /* Modal: wider on tablet */
+  .modal-lg {
+    max-width: 90%;
   }
 }
 
+/* --- Mobile (≤768px) --- */
 @media (max-width: 768px) {
+  /* All grids → single column */
   .grid-2, .grid-3, .grid-4, .grid-5, .grid-6 {
     grid-template-columns: 1fr;
   }
+
   .container {
-    padding: 0 15px;
+    padding: 0 12px;
   }
+
   .main-content {
-    padding: 15px;
+    padding: 12px;
   }
+
+  /* Header: wrap items and shrink */
   .header {
-    padding: 10px 15px;
+    padding: 10px 12px;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    border-radius: 10px;
+    margin-bottom: 15px;
   }
+  .header h2 {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+
+  /* Cards: less padding */
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  .card-header {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+  .card-header h3 {
+    font-size: 1.05rem;
+  }
+
+  /* Modals: nearly full-screen */
   .modal {
     padding: 20px;
-    width: 95%;
+    width: 96%;
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+  .modal-lg {
+    max-width: 96%;
+  }
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+  .modal-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-footer .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  /* Tables: tighter padding, scroll container */
+  .table-container {
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
   }
   .table th, .table td {
-    padding: 10px 12px;
+    padding: 10px 10px;
+    font-size: 13px;
   }
+  .table thead th {
+    font-size: 12px;
+  }
+
+  /* Stat cards: stack vertically */
   .stat-card {
     flex-direction: column;
     text-align: center;
+    gap: 12px;
   }
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 12px;
+  }
+  .stat-info h3 {
+    font-size: 22px;
+  }
+  .stat-info p {
+    font-size: 13px;
+  }
+
+  /* Buttons: slightly smaller, full-width in stacks */
   .btn {
-    padding: 8px 16px;
+    padding: 9px 16px;
+    font-size: 13px;
   }
+  .btn-lg {
+    padding: 12px 22px;
+    font-size: 14px;
+  }
+
+  /* Tabs: horizontal scroll */
   .tabs {
     overflow-x: auto;
     flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
   }
   .tab {
     padding: 10px 16px;
     white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+
+  /* Forms: full width inputs */
+  .form-control {
+    font-size: 14px;
+    padding: 11px 14px;
+  }
+
+  /* Pagination: compact */
+  .pagination {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .pagination-item {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  /* Search bar */
+  .search-bar {
+    border-radius: 8px;
+  }
+  .search-bar input {
+    padding: 10px 0;
+    font-size: 13px;
+  }
+
+  /* Charts: shorter on mobile */
+  .chart-container {
+    height: 220px;
+  }
+  .chart-container-lg {
+    height: 280px;
+  }
+  .chart-container-sm {
+    height: 160px;
+  }
+
+  /* Alerts */
+  .alert {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  /* Badges */
+  .badge {
+    padding: 3px 10px;
+    font-size: 11px;
+  }
+
+  /* Progress bar */
+  .progress {
+    height: 6px;
+  }
+
+  /* Dropdown */
+  .dropdown-menu {
+    min-width: 170px;
+    border-radius: 8px;
+  }
+  .dropdown-item {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  /* Flex utilities: force column on mobile */
+  .d-flex.flex-wrap {
+    gap: 8px;
+  }
+
+  /* Hide desktop-only text */
+  .hide-mobile {
+    display: none !important;
   }
 }
 
+/* --- Small Mobile (≤576px) --- */
 @media (max-width: 576px) {
   .header h2 {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    max-width: 140px;
   }
+
   .card {
-    padding: 15px;
+    padding: 12px;
+    border-radius: 10px;
   }
-  .btn-group {
+
+  /* Modal: full-screen feel */
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    min-height: 50vh;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  /* Button groups */
+  .btn-group,
+  .d-flex.gap-2 {
     flex-direction: column;
     width: 100%;
   }
-  .btn-group .btn {
+  .btn-group .btn,
+  .d-flex.gap-2 > .btn {
     width: 100%;
+  }
+
+  /* Stat card */
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+  .stat-info h3 {
+    font-size: 20px;
+  }
+
+  /* Grid gap */
+  .grid {
+    gap: 12px;
+  }
+
+  /* Tables: even smaller */
+  .table th, .table td {
+    padding: 8px 8px;
+    font-size: 12px;
+  }
+
+  /* Form groups */
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .form-control {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  /* Pagination compact */
+  .pagination-item {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 40px 16px;
+  }
+  .empty-state-icon {
+    font-size: 44px;
+  }
+
+  .text-2xl { font-size: 20px; }
+  .text-3xl { font-size: 24px; }
+}
+
+/* --- Very Small Screens (≤400px) --- */
+@media (max-width: 400px) {
+  .header {
+    padding: 8px 10px;
+  }
+  .header h2 {
+    font-size: 0.75rem;
+    max-width: 100px;
+  }
+
+  .main-content {
+    padding: 8px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .modal {
+    padding: 14px;
   }
 }
 
-/* Print Styles */
+/* ============================================
+   TOUCH DEVICE ENHANCEMENTS
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger tap targets */
+  .btn {
+    min-height: 44px;
+  }
+  .btn-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .btn-sm {
+    min-height: 36px;
+  }
+
+  .sidebar-link {
+    padding: 14px 16px;
+  }
+
+  .tab {
+    padding: 12px 18px;
+  }
+
+  .pagination-item {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control {
+    min-height: 44px;
+  }
+
+  /* Remove hover transforms on touch */
+  .card:hover {
+    transform: none;
+  }
+  .report-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
 @media print {
-  .sidebar, .header, .btn, .no-print {
+  .sidebar, .header, .btn, .no-print,
+  .menu-toggle, .back-to-top, .sidebar-overlay {
     display: none !important;
   }
   .main-content {
@@ -970,5 +1307,9 @@ body {
   .card {
     box-shadow: none;
     border: 1px solid #ddd;
+    break-inside: avoid;
+  }
+  .modal-overlay {
+    display: none !important;
   }
 }

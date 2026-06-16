@@ -136,8 +136,16 @@ const UserManagement = () => {
     
     if (!selectedUser && !formData.password) {
       newErrors.password = 'Password is required for new users';
-    } else if (!selectedUser && formData.password && formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!selectedUser && formData.password) {
+      if (formData.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters';
+      } else if (!/[A-Z]/.test(formData.password)) {
+        newErrors.password = 'Password must contain at least one uppercase letter';
+      } else if (!/[a-z]/.test(formData.password)) {
+        newErrors.password = 'Password must contain at least one lowercase letter';
+      } else if (!/[0-9]/.test(formData.password)) {
+        newErrors.password = 'Password must contain at least one number';
+      }
     }
     
     setErrors(newErrors);
@@ -684,9 +692,26 @@ const UserManagement = () => {
                           className={`form-control ${errors.password ? 'error' : ''}`}
                           value={formData.password}
                           onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                          placeholder="Minimum 8 characters"
+                          placeholder="e.g. MyPass123"
                         />
                         {errors.password && <span className="form-error">{errors.password}</span>}
+                        <div className="password-requirements">
+                          <p className="password-req-title">Password must contain:</p>
+                          <ul className="password-req-list">
+                            <li className={formData.password.length >= 8 ? 'met' : ''}>
+                              {formData.password.length >= 8 ? '✓' : '○'} At least 8 characters
+                            </li>
+                            <li className={/[A-Z]/.test(formData.password) ? 'met' : ''}>
+                              {/[A-Z]/.test(formData.password) ? '✓' : '○'} One uppercase letter (A-Z)
+                            </li>
+                            <li className={/[a-z]/.test(formData.password) ? 'met' : ''}>
+                              {/[a-z]/.test(formData.password) ? '✓' : '○'} One lowercase letter (a-z)
+                            </li>
+                            <li className={/[0-9]/.test(formData.password) ? 'met' : ''}>
+                              {/[0-9]/.test(formData.password) ? '✓' : '○'} One number (0-9)
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -730,8 +755,25 @@ const UserManagement = () => {
                     className="form-control"
                     value={passwordData.new_password}
                     onChange={(e) => setPasswordData(prev => ({ ...prev, new_password: e.target.value }))}
-                    placeholder="Minimum 8 characters"
+                    placeholder="e.g. MyPass123"
                   />
+                  <div className="password-requirements">
+                    <p className="password-req-title">Password must contain:</p>
+                    <ul className="password-req-list">
+                      <li className={passwordData.new_password.length >= 8 ? 'met' : ''}>
+                        {passwordData.new_password.length >= 8 ? '✓' : '○'} At least 8 characters
+                      </li>
+                      <li className={/[A-Z]/.test(passwordData.new_password) ? 'met' : ''}>
+                        {/[A-Z]/.test(passwordData.new_password) ? '✓' : '○'} One uppercase letter (A-Z)
+                      </li>
+                      <li className={/[a-z]/.test(passwordData.new_password) ? 'met' : ''}>
+                        {/[a-z]/.test(passwordData.new_password) ? '✓' : '○'} One lowercase letter (a-z)
+                      </li>
+                      <li className={/[0-9]/.test(passwordData.new_password) ? 'met' : ''}>
+                        {/[0-9]/.test(passwordData.new_password) ? '✓' : '○'} One number (0-9)
+                      </li>
+                    </ul>
+                  </div>
                 </div>
                 
                 <div className="form-group">
@@ -944,6 +986,61 @@ const UserManagement = () => {
           .search-bar {
             min-width: 100%;
           }
+          
+          .d-flex.justify-between {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+          }
+          
+          .d-flex.flex-wrap.gap-2.align-end {
+            flex-direction: column;
+          }
+          
+          .btn-icon {
+            width: 36px;
+            height: 36px;
+          }
+          
+          .user-avatar {
+            width: 34px;
+            height: 34px;
+            font-size: 14px;
+            border-radius: 8px;
+          }
+        }
+
+        .password-requirements {
+          margin-top: 8px;
+          padding: 10px 14px;
+          background: var(--bg-secondary);
+          border-radius: 8px;
+          border: 1px solid var(--border-color);
+        }
+        
+        .password-req-title {
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          margin-bottom: 6px;
+        }
+        
+        .password-req-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        
+        .password-req-list li {
+          font-size: 12px;
+          color: var(--text-tertiary);
+          padding: 2px 0;
+          transition: color 0.2s ease;
+        }
+        
+        .password-req-list li.met {
+          color: var(--success-color);
+          font-weight: 500;
         }
       `}</style>
     </div>

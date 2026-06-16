@@ -693,16 +693,17 @@
   display: none;
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 22px;
   color: var(--text-primary);
   cursor: pointer;
-  padding: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
-@media (max-width: 992px) {
-  .menu-toggle {
-    display: block;
-  }
+.menu-toggle:hover {
+  background: var(--hover-bg);
 }
 
 /* Back to Top */
@@ -735,4 +736,382 @@
 
 .back-to-top:hover {
   transform: translateY(-3px);
+}
+
+/* ============================================
+   COMPONENT RESPONSIVE STYLES
+   ============================================ */
+
+/* --- Tablets (≤992px) --- */
+@media (max-width: 992px) {
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Sidebar overlay backdrop */
+  .sidebar-overlay {
+    display: block;
+  }
+
+  /* Login */
+  .login-card {
+    padding: 30px;
+    max-width: 400px;
+  }
+
+  /* Dashboard widgets */
+  .widget-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Approval cards */
+  .approval-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Report cards */
+  .report-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    border-radius: 16px;
+  }
+}
+
+/* --- Mobile (≤768px) --- */
+@media (max-width: 768px) {
+  /* Login Page */
+  .login-container {
+    padding: 16px;
+  }
+  .login-card {
+    padding: 24px;
+    max-width: 100%;
+    border-radius: 16px;
+  }
+  .login-header h2 {
+    font-size: 1.5rem;
+  }
+  .login-header p {
+    font-size: 14px;
+  }
+  .login-form .form-group {
+    margin-bottom: 18px;
+  }
+  .login-form .btn {
+    padding: 13px;
+    font-size: 15px;
+  }
+
+  /* Sidebar */
+  .sidebar-header {
+    padding: 18px 16px;
+  }
+  .sidebar-header h3 {
+    font-size: 1.5rem;
+  }
+  .sidebar-nav {
+    padding: 14px 10px;
+  }
+  .sidebar-link {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .sidebar-footer {
+    padding: 14px;
+  }
+
+  /* Punch Card */
+  .punch-time-display {
+    font-size: 2rem;
+    margin: 14px 0;
+  }
+  .punch-status {
+    padding: 6px 16px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  .punch-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .punch-buttons .btn {
+    width: 100%;
+    max-width: 280px;
+    min-width: 0;
+    padding: 13px 20px;
+    font-size: 15px;
+  }
+
+  /* Photo Capture */
+  .photo-preview {
+    width: 150px;
+    height: 150px;
+    margin: 14px auto;
+  }
+  .photo-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Map */
+  .map-container {
+    height: 220px;
+    border-radius: 8px;
+  }
+  .location-info {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  /* Dashboard Widgets */
+  .widget-title {
+    font-size: 0.95rem;
+  }
+  .widget-actions {
+    gap: 6px;
+  }
+
+  /* Approval Cards */
+  .approval-card {
+    padding: 14px;
+    border-radius: 10px;
+  }
+  .approval-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+  }
+  .approval-info h4 {
+    font-size: 14px;
+  }
+  .approval-info p {
+    font-size: 12px;
+  }
+  .approval-details {
+    padding: 10px;
+    font-size: 13px;
+  }
+  .approval-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .approval-actions .btn {
+    width: 100%;
+  }
+
+  /* Report Cards */
+  .report-card {
+    padding: 18px;
+  }
+  .report-icon {
+    width: 54px;
+    height: 54px;
+    font-size: 22px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+  .report-card h4 {
+    font-size: 14px;
+  }
+  .report-card p {
+    font-size: 12px;
+  }
+
+  /* User Management */
+  .user-table-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  /* Shift */
+  .shift-timeline {
+    padding: 8px;
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+  .shift-time {
+    font-size: 14px;
+  }
+
+  /* Geo-fence Map */
+  .geofence-map {
+    height: 260px;
+  }
+  .geofence-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Notifications */
+  .notification-list {
+    max-height: 300px;
+  }
+  .notification-item {
+    padding: 12px;
+  }
+  .notification-title {
+    font-size: 14px;
+  }
+
+  /* Calendar */
+  .calendar-container {
+    padding: 14px;
+    border-radius: 12px;
+  }
+  .calendar-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .calendar-day-header {
+    padding: 6px;
+    font-size: 11px;
+  }
+  .calendar-day {
+    padding: 6px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+  .calendar-grid {
+    gap: 3px;
+  }
+
+  /* Settings */
+  .settings-section {
+    margin-bottom: 20px;
+  }
+  .settings-title {
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+  .settings-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  /* File Upload */
+  .file-upload {
+    padding: 20px;
+    border-radius: 8px;
+  }
+  .file-upload-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  .file-item {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  /* Skeleton */
+  .skeleton-card {
+    height: 100px;
+  }
+  .skeleton-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  /* Toggle Switch */
+  .toggle-switch {
+    width: 46px;
+    height: 24px;
+  }
+  .toggle-slider {
+    width: 18px;
+    height: 18px;
+  }
+  .toggle-switch.active .toggle-slider {
+    transform: translateX(22px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    padding: 40px 16px;
+  }
+  .empty-state-icon {
+    font-size: 46px;
+    margin-bottom: 14px;
+  }
+  .empty-state h4 {
+    font-size: 15px;
+  }
+
+  /* Back to Top: smaller on mobile */
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
+
+/* --- Small Mobile (≤576px) --- */
+@media (max-width: 576px) {
+  /* Login */
+  .login-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+  .login-header h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Punch Card */
+  .punch-time-display {
+    font-size: 1.6rem;
+  }
+
+  /* Calendar: smaller cells */
+  .calendar-day-header {
+    padding: 4px;
+    font-size: 10px;
+  }
+  .calendar-day {
+    padding: 4px;
+    font-size: 11px;
+  }
+
+  /* Approval */
+  .approval-user {
+    gap: 8px;
+  }
+  .approval-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  /* Notifications */
+  .notification-item {
+    padding: 10px;
+  }
+  .notification-title {
+    font-size: 13px;
+  }
+
+  /* Settings */
+  .settings-item {
+    padding: 10px 0;
+  }
 }
