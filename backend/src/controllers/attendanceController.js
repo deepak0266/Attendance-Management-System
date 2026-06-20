@@ -108,21 +108,24 @@ exports.submitPunch = async (req, res, next) => {
       photo, 
       idempotency_key,
       source = 'WEB',
+      punch_method = 'MANUAL',
       device_info = {}
     } = req.body;
     
-    // Check idempotency
-    const existingPunch = await AttendanceLog.findOne({ 
-      idempotency_key 
-    });
-    
-    if (existingPunch) {
-      return res.json({
-        success: true,
-        message: 'Punch already recorded',
-        data: existingPunch,
-        duplicate: true
+    // Check idempotency (only if key is provided)
+    if (idempotency_key) {
+      const existingPunch = await AttendanceLog.findOne({ 
+        idempotency_key 
       });
+      
+      if (existingPunch) {
+        return res.json({
+          success: true,
+          message: 'Punch already recorded',
+          data: existingPunch,
+          duplicate: true
+        });
+      }
     }
     
     // Get user with manager info
@@ -169,10 +172,7 @@ exports.submitPunch = async (req, res, next) => {
     
     // --- ADVANCED FEATURES: DEVICE, QR, SELFIE ---
     const requireDevice = policy.rules.attendance.require_registered_device;
-    if (requireDevice) {
-      if (!device_info || !device_info.device_id) {
-        return res.status(403).json({ success: false, error: 'Device ID is missing' });
-      }
+    if (requireDevice && device_info && device_info.device_id) {
       const device = await Device.findOne({ user_id: userId, device_id: device_info.device_id, status: 'APPROVED' });
       if (!device) {
         return res.status(403).json({ success: false, error: 'Unregistered device. Please request approval.' });
@@ -181,29 +181,33 @@ exports.submitPunch = async (req, res, next) => {
       await device.save();
     }
 
-    const qrTypeGlobal = policy.rules.attendance.qr_type || 'DYNAMIC';
-    const qrTypeOverride = user.preferences?.qr_type_override;
-    const activeQrType = qrTypeOverride || qrTypeGlobal;
+    // Only validate QR token if this is a QR-based punch (not manual)
+    const isQRPunch = punch_method === 'QR';
+    if (isQRPunch) {
+      const qrTypeGlobal = policy.rules.attendance.qr_type || 'DYNAMIC';
+      const qrTypeOverride = user.preferences?.qr_type_override;
+      const activeQrType = qrTypeOverride || qrTypeGlobal;
 
-    if (activeQrType !== 'NONE') {
-      const qrToken = req.body.qr_token;
-      if (!qrToken) {
-        return res.status(400).json({ success: false, error: 'QR token is required' });
-      }
-      try {
-        const decoded = jwt.verify(qrToken, process.env.JWT_SECRET || 'fallback_secret');
-        if (decoded.type !== `${activeQrType}_QR`) {
-          return res.status(400).json({ success: false, error: `Invalid QR type. Expected ${activeQrType}` });
+      if (activeQrType !== 'NONE') {
+        const qrToken = req.body.qr_token;
+        if (!qrToken) {
+          return res.status(400).json({ success: false, error: 'QR token is required' });
         }
-      } catch (err) {
-        return res.status(400).json({ success: false, error: 'Invalid or expired QR code' });
+        try {
+          const decoded = jwt.verify(qrToken, process.env.JWT_SECRET || 'fallback_secret');
+          if (decoded.type !== `${activeQrType}_QR`) {
+            return res.status(400).json({ success: false, error: `Invalid QR type. Expected ${activeQrType}` });
+          }
+        } catch (err) {
+          return res.status(400).json({ success: false, error: 'Invalid or expired QR code' });
+        }
       }
     }
 
     let finalSelfieUrl = photo || null;
     const requireSelfieGlobal = policy.rules.attendance.require_selfie || false;
     const requireSelfieOverride = user.preferences?.require_selfie_override;
-    const requireSelfie = requireSelfieOverride !== null ? requireSelfieOverride : requireSelfieGlobal;
+    const requireSelfie = requireSelfieOverride !== undefined ? requireSelfieOverride : requireSelfieGlobal;
 
     if (requireSelfie && !finalSelfieUrl) {
       return res.status(400).json({ success: false, error: 'Selfie is required to punch' });

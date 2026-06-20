@@ -174,9 +174,10 @@ const PunchInOut = ({ showGuidelines = false }) => {
           accuracy: location.accuracy
         },
         client_timestamp: new Date().toISOString(),
-        photo: photoData,
+        ...(photoData ? { photo: photoData } : {}),
         idempotency_key: idempotencyKey,
         source: 'WEB',
+        punch_method: 'MANUAL',
         device_info: {
           userAgent: navigator.userAgent,
           platform: navigator.platform

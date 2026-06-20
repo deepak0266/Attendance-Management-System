@@ -68,7 +68,7 @@ const Attendance = ({ toggleTheme, theme }) => {
               <Routes>
                 <Route path="/" element={<Navigate to="/attendance/punch" replace />} />
                 <Route path="/punch" element={<PunchInOut showGuidelines={true} />} />
-                <Route path="/qr-punch" element={<QRScanner requireSelfie={true} />} />
+                <Route path="/qr-punch" element={<QRScanner />} />
                 <Route path="/device-registration" element={<DeviceRegistration />} />
                 <Route path="/log" element={<AttendanceLog />} />
                 <Route path="/chart" element={<AttendanceChart />} />

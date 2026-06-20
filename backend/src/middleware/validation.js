@@ -147,7 +147,7 @@ exports.validatePunch = [
     .isISO8601().withMessage('Invalid timestamp format'),
   
   body('idempotency_key')
-    .optional()
+    .optional({ values: 'falsy' })
     .isString().withMessage('Idempotency key must be a string')
     .isLength({ max: 255 }).withMessage('Idempotency key too long'),
   
@@ -156,7 +156,7 @@ exports.validatePunch = [
     .isIn(['WEB', 'MOBILE', 'OFFLINE']).withMessage('Invalid source'),
   
   body('photo')
-    .optional()
+    .optional({ values: 'falsy' })
     .isString().withMessage('Photo must be a base64 string or URL')
 ];
 
