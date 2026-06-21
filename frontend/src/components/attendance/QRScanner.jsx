@@ -230,6 +230,8 @@ const QRScanner = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to submit punch');
+      setQrPayload(null);
+      setSelfieSrc(null);
     } finally {
       setLoading(false);
     }
