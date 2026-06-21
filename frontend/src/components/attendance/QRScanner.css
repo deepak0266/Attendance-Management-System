@@ -338,3 +338,40 @@
     font-size: 1.2rem;
   }
 }
+
+.start-scanner-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 15px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.camera-icon-large {
+  font-size: 48px;
+  color: #667eea;
+  margin-bottom: 10px;
+}
+
+.btn-start-camera {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-start-camera:hover {
+  background: #5a6fd6;
+}

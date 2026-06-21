@@ -19,6 +19,7 @@ const QRScanner = () => {
   const [loading, setLoading] = useState(false);
   const [requireSelfie, setRequireSelfie] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showScanner, setShowScanner] = useState(false);
   const webcamRef = useRef(null);
   const html5QrCodeRef = useRef(null);
   const scannerContainerRef = useRef('qr-reader-container');
@@ -58,16 +59,16 @@ const QRScanner = () => {
     init();
   }, []);
 
-  // Start QR scanner when no token from URL and component is ready
+  // Start QR scanner when user explicitly clicks the start button
   useEffect(() => {
-    if (initialLoading || qrPayload || punchResult) return;
+    if (initialLoading || qrPayload || punchResult || !showScanner) return;
 
     startScanner();
 
     return () => {
       stopScanner();
     };
-  }, [initialLoading, qrPayload, punchResult]);
+  }, [initialLoading, qrPayload, punchResult, showScanner]);
 
   // Auto-submit if we have URL token and selfie is not required
   useEffect(() => {
@@ -332,12 +333,27 @@ const QRScanner = () => {
 
       {!qrPayload ? (
         <div className="scanner-wrapper">
-          <div id={scannerContainerRef.current} className="qr-reader-box"></div>
-          {!scannerReady && (
-            <div className="scanner-placeholder">
-              <FaSpinner className="fa-spin" size={24} />
-              <p>Starting camera...</p>
+          {!showScanner ? (
+            <div className="start-scanner-prompt">
+              <FaCamera className="camera-icon-large" />
+              <p>Camera access is required to scan QR codes</p>
+              <button 
+                className="btn-start-camera"
+                onClick={() => setShowScanner(true)}
+              >
+                Start Camera
+              </button>
             </div>
+          ) : (
+            <>
+              <div id={scannerContainerRef.current} className="qr-reader-box"></div>
+              {!scannerReady && (
+                <div className="scanner-placeholder">
+                  <FaSpinner className="fa-spin" size={24} />
+                  <p>Starting camera...</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       ) : (
