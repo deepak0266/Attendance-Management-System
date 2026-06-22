@@ -93,7 +93,8 @@ export const apiService = {
     getChartData: (params) => api.get('/attendance/chart', { params }),
     getSummary: () => api.get('/attendance/summary'),
     override: (attendanceId, data) => api.post(`/attendance/override/${attendanceId}`, data),
-    getPhotoConfig: () => api.get('/attendance/photo-config')
+    getPhotoConfig: () => api.get('/attendance/photo-config'),
+    requestDeviceApproval: (data) => api.post('/device/request', data)
   },
   
   // Users

@@ -17,7 +17,24 @@ class AttendanceService {
       
       return response.data;
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to record punch');
+      const isRequireOverride = error.response?.data?.require_override_reason;
+      const isUnregisteredDevice = error.response?.data?.error?.includes('Unregistered device');
+      
+      if (!isRequireOverride && !isUnregisteredDevice) {
+        toast.error(error.response?.data?.error || 'Failed to record punch');
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Request device approval
+   */
+  async requestDeviceApproval(data) {
+    try {
+      const response = await apiService.attendance.requestDeviceApproval(data);
+      return response.data;
+    } catch (error) {
       throw error;
     }
   }

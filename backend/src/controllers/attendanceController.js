@@ -256,6 +256,19 @@ exports.submitPunch = async (req, res, next) => {
         isInside: closestValidation.isInside,
         geoFenceName: closestValidation.geoFenceName
       };
+
+      if (requiresApproval && !req.body.override_reason) {
+        return res.status(400).json({
+          success: false,
+          require_override_reason: true,
+          distance: Math.round(closestValidation.distance),
+          error: `You are ${Math.round(closestValidation.distance)}m away from your office. This requires an approval message.`
+        });
+      }
+
+      if (req.body.override_reason) {
+        validationReason = req.body.override_reason;
+      }
     }
     
     // Find or create attendance log for today
@@ -334,15 +347,21 @@ exports.submitPunch = async (req, res, next) => {
           });
         }
         attendanceLog.punch_in = punchData;
-        attendanceLog.status = requiresApproval ? 'PENDING_APPROVAL' : 'PRESENT';
-        
-        // Check if late
+        let isLate = false;
         const shiftStartTime = shift.getStartDateTime(today);
         const graceMinutes = shift.grace_period_minutes;
         const lateThreshold = moment(shiftStartTime).add(graceMinutes, 'minutes');
         
         if (moment(serverTimestamp).isAfter(lateThreshold)) {
+          isLate = true;
+        }
+
+        if (requiresApproval) {
+          attendanceLog.status = 'PENDING_APPROVAL';
+        } else if (isLate) {
           attendanceLog.status = 'LATE';
+        } else {
+          attendanceLog.status = 'PRESENT';
         }
         break;
         
@@ -702,7 +721,7 @@ exports.getChartData = async (req, res, next) => {
 exports.overrideAttendance = async (req, res, next) => {
   try {
     const { attendanceId } = req.params;
-    const { punch_in, punch_out, reason, override_type } = req.body;
+    const { punch_in, punch_out, reason, override_type, override_status } = req.body;
     const userId = req.user.id;
     const userRole = req.user.role;
     
@@ -790,6 +809,29 @@ exports.overrideAttendance = async (req, res, next) => {
         policy
       );
       attendanceLog.computed_data = calculations;
+    }
+    
+    // Handle status override (e.g., excusing a LATE punch)
+    if (override_status) {
+      if (oldValue.status === 'LATE' && override_status === 'PRESENT' && userRole !== 'SUPER_ADMIN') {
+        const startOfMonth = moment(attendanceLog.date).startOf('month').toDate();
+        const endOfMonth = moment(attendanceLog.date).endOf('month').toDate();
+        
+        const excusedLatesCount = await SystemActionLog.countDocuments({
+          action_type: 'ATTENDANCE_OVERRIDE',
+          target_user_id: attendanceLog.user_id._id,
+          'metadata.override_type': 'EXCUSE_LATE',
+          created_at: { $gte: startOfMonth, $lte: endOfMonth }
+        });
+
+        if (excusedLatesCount >= 2) {
+          return res.status(403).json({
+            success: false,
+            error: 'Employee has reached the maximum limit of 2 excused late days this month. Only Super Admin can approve more.'
+          });
+        }
+      }
+      attendanceLog.status = override_status;
     }
     
     attendanceLog.requires_approval = false;

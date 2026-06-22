@@ -22,9 +22,14 @@ const PunchInOut = ({ showGuidelines = false }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [overridePromptData, setOverridePromptData] = useState(null);
+  const [overrideReason, setOverrideReason] = useState('');
+  const [deviceApprovalPrompt, setDeviceApprovalPrompt] = useState(false);
+  const [pendingPunchType, setPendingPunchType] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const isPunchingRef = useRef(false);
 
   useEffect(() => {
     initializePage();
@@ -135,37 +140,36 @@ const PunchInOut = ({ showGuidelines = false }) => {
   };
 
   const handlePunch = async (type) => {
-    if (loading) return;
-
-    if (!location) {
-      toast.error('Location is required for attendance');
-      await getLocation();
-      return;
-    }
-
-    if (!locationService.isAccurateEnough(location.accuracy)) {
-      toast.warning(`Low GPS accuracy (${Math.round(location.accuracy)}m). Retrying...`);
-      try {
-        const newLocation = await locationService.getLocationWithRetry(2, 1500);
-        setLocation(newLocation);
-      } catch (error) {
-        toast.error('Could not get accurate location. Please try again.');
-        return;
-      }
-    }
-
-    let photoData = null;
-    if ((photoCaptureEnabled || photoRequired) && type === 'IN') {
-      if (!capturedPhoto && photoRequired) {
-        toast.error('Photo capture is required for punch in');
-        return;
-      }
-      photoData = capturedPhoto;
-    }
-
+    if (isPunchingRef.current || loading) return;
+    isPunchingRef.current = true;
     setLoading(true);
 
     try {
+      if (!location) {
+        toast.error('Location is required for attendance');
+        await getLocation();
+        return;
+      }
+
+      if (!locationService.isAccurateEnough(location.accuracy)) {
+        toast.warning(`Low GPS accuracy (${Math.round(location.accuracy)}m). Retrying...`);
+        try {
+          const newLocation = await locationService.getLocationWithRetry(2, 1500);
+          setLocation(newLocation);
+        } catch (error) {
+          toast.error('Could not get accurate location. Please try again.');
+          return;
+        }
+      }
+
+      let photoData = null;
+      if ((photoCaptureEnabled || photoRequired) && type === 'IN') {
+        if (!capturedPhoto && photoRequired) {
+          toast.error('Photo capture is required for punch in');
+          return;
+        }
+        photoData = capturedPhoto;
+      }
       const idempotencyKey = `punch_${user.id}_${Date.now()}_${uuidv4()}`;
 
       const punchData = {
@@ -179,10 +183,16 @@ const PunchInOut = ({ showGuidelines = false }) => {
         ...(photoData ? { photo: photoData } : {}),
         idempotency_key: idempotencyKey,
         source: 'WEB',
-        punch_method: 'MANUAL',
+        punch_method: overrideReason ? 'FIELD_WORK' : 'MANUAL',
+        override_reason: overrideReason,
         device_info: {
           userAgent: navigator.userAgent,
-          platform: navigator.platform
+          platform: navigator.platform,
+          device_id: localStorage.getItem('deviceId') || (() => {
+            const id = uuidv4();
+            localStorage.setItem('deviceId', id);
+            return id;
+          })()
         }
       };
 
@@ -193,10 +203,48 @@ const PunchInOut = ({ showGuidelines = false }) => {
       }
 
       setCapturedPhoto(null);
+      setOverrideReason('');
+      setOverridePromptData(null);
       await checkCurrentStatus();
     } catch (error) {
-      // Error is already toasted by attendanceService
-      await checkCurrentStatus(); // Sync UI in case state is mismatched
+      if (error.response?.data?.require_override_reason) {
+        setOverridePromptData({
+          distance: error.response.data.distance,
+          error: error.response.data.error
+        });
+        setPendingPunchType(type);
+      } else if (error.response?.data?.error?.includes('Unregistered device')) {
+        setDeviceApprovalPrompt(true);
+      } else {
+        await checkCurrentStatus(); // Sync UI in case state is mismatched
+      }
+    } finally {
+      isPunchingRef.current = false;
+      setLoading(false);
+    }
+  };
+
+  const submitConfirmedPunch = () => {
+    if (!overrideReason.trim()) {
+      toast.error('Please enter a reason');
+      return;
+    }
+    setOverridePromptData(null);
+    handlePunch(pendingPunchType);
+  };
+
+  const requestDeviceApproval = async () => {
+    try {
+      setLoading(true);
+      const deviceId = localStorage.getItem('deviceId') || 'unknown';
+      await apiService.attendance.requestDeviceApproval({
+        device_id: deviceId,
+        platform: navigator.platform
+      });
+      toast.success('Device approval request sent successfully!');
+      setDeviceApprovalPrompt(false);
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to request device approval');
     } finally {
       setLoading(false);
     }
@@ -531,6 +579,69 @@ const PunchInOut = ({ showGuidelines = false }) => {
               <> | Punched out at: {moment(attendanceData.punch_out.server_timestamp).format('HH:mm:ss')}</>
             )}
           </p>
+        </div>
+      )}
+
+      {/* Override Prompt Modal */}
+      {overridePromptData && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="text-xl font-bold mb-4">Out of Office</h3>
+            <p className="mb-4 text-warning">
+              <FaExclamationTriangle className="inline mr-2" />
+              {overridePromptData.error}
+            </p>
+            <textarea
+              className="form-input w-full mb-4"
+              rows="3"
+              placeholder="Enter your reason (e.g. At Client XYZ for marketing meeting)"
+              value={overrideReason}
+              onChange={(e) => setOverrideReason(e.target.value)}
+            ></textarea>
+            <div className="flex gap-4 justify-end">
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setOverridePromptData(null)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={submitConfirmedPunch}
+                disabled={loading}
+              >
+                {loading ? <FaSpinner className="animate-spin" /> : 'Send Approval'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Device Approval Modal */}
+      {deviceApprovalPrompt && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="text-xl font-bold mb-4">Unregistered Device</h3>
+            <p className="mb-4 text-warning">
+              <FaExclamationTriangle className="inline mr-2" />
+              This device is not registered to your account. Would you like to request approval to use this device for attendance?
+            </p>
+            <div className="flex gap-4 justify-end">
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setDeviceApprovalPrompt(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={requestDeviceApproval}
+                disabled={loading}
+              >
+                {loading ? <FaSpinner className="animate-spin" /> : 'Request Approval'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -61,7 +61,22 @@ router.get('/pending', authMiddleware, authorize('HR', 'MANAGER', 'SUPER_ADMIN')
 
     const devices = await Device.find(query).populate('user_id', 'full_name email employee_id');
     
-    res.json({ success: true, data: devices });
+    // For each pending request, fetch the user's device history
+    const devicesWithHistory = await Promise.all(devices.map(async (device) => {
+      const history = await Device.find({ 
+        user_id: device.user_id._id, 
+        _id: { $ne: device._id } 
+      })
+      .sort({ created_at: -1 })
+      .populate('approved_by', 'full_name email');
+      
+      return {
+        ...device.toObject(),
+        history
+      };
+    }));
+    
+    res.json({ success: true, data: devicesWithHistory });
   } catch (error) {
     logger.error('Get pending devices error:', error);
     res.status(500).json({ success: false, error: 'Server error' });
