@@ -24,6 +24,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const approvalRoutes = require('./routes/approvalRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const roleRoutes = require('./routes/roleRoutes');
+const deviceRoutes = require('./routes/deviceRoutes');
 
 // Import logger
 const logger = require('./utils/logger');
@@ -219,6 +220,7 @@ app.use('/api/reports', authMiddleware, csrfProtection, reportRoutes);
 app.use('/api/approvals', authMiddleware, csrfProtection, approvalRoutes);
 app.use('/api/notifications', authMiddleware, csrfProtection, notificationRoutes);
 app.use('/api/roles', authMiddleware, csrfProtection, roleRoutes);
+app.use('/api/device', authMiddleware, csrfProtection, deviceRoutes);
 
 // API Documentation route (optional)
 app.get('/api/docs', (req, res) => {

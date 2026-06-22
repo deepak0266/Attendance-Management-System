@@ -60,7 +60,16 @@ api.interceptors.response.use(
     
     // Handle other errors
     if (error.response?.status === 403) {
-      toast.error('You do not have permission to perform this action');
+      const serverError = error.response?.data?.error;
+      toast.error(serverError || 'You do not have permission to perform this action');
+      
+      // If CSRF token is invalid, it likely means the session expired
+      if (serverError === 'Invalid CSRF token') {
+        localStorage.removeItem('csrfToken');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+      }
     } else if (error.response?.status === 429) {
       toast.error('Too many requests. Please try again later.');
     } else if (error.response?.status >= 500) {
