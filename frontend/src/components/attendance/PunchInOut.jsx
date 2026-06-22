@@ -354,7 +354,7 @@ const PunchInOut = ({ showGuidelines = false }) => {
         </div>
       )}
 
-      {location && (
+      {location ? (
         <div className="location-info">
           <FaMapMarkerAlt className="text-success" />
           <span>
@@ -365,6 +365,14 @@ const PunchInOut = ({ showGuidelines = false }) => {
               </span>
             )}
           </span>
+        </div>
+      ) : (
+        <div className="location-info" style={{ color: 'var(--warning-color)' }}>
+          <FaMapMarkerAlt /> 
+          <span>Waiting for location... Please enable GPS.</span>
+          <button className="btn btn-sm" style={{ marginLeft: '10px', padding: '2px 8px' }} onClick={getLocation}>
+            Retry
+          </button>
         </div>
       )}
 

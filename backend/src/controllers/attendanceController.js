@@ -290,9 +290,14 @@ exports.submitPunch = async (req, res, next) => {
     };
     
     if (!validTransitions[currentState]?.includes(type)) {
+      let friendlyError = `Invalid state transition from ${currentState} to ${type}`;
+      if (currentState === 'PUNCHED_IN' && type === 'IN') friendlyError = 'You are already punched in.';
+      if (currentState === 'PUNCHED_OUT' && type === 'OUT') friendlyError = 'You are already punched out.';
+      if (currentState === 'NOT_PUNCHED' && type === 'OUT') friendlyError = 'You must punch in first.';
+      
       return res.status(400).json({ 
         success: false,
-        error: `Invalid state transition from ${currentState} to ${type}` 
+        error: friendlyError 
       });
     }
     

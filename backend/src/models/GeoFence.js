@@ -284,7 +284,7 @@ geoFenceSchema.methods.isPointInRectangle = function(lat, lng) {
 // Method to validate location with accuracy check
 geoFenceSchema.methods.validateLocation = function(lat, lng, accuracy) {
   const isInside = this.isPointInside(lat, lng);
-  const distance = this.center ? 
+  const distance = (this.center && this.center.lat != null && this.center.lng != null) ? 
     this.calculateDistance(lat, lng, this.center.lat, this.center.lng) : 
     null;
   
@@ -295,10 +295,10 @@ geoFenceSchema.methods.validateLocation = function(lat, lng, accuracy) {
   let reason = '';
   
   if (!isInside) {
-    const isNearby = distance && 
+    const isNearby = distance !== null && !isNaN(distance) && 
       distance <= this.validation_rules.max_distance_for_approval_meters;
     
-    requiresApproval = this.validation_rules.allow_manual_override && isNearby;
+    requiresApproval = Boolean(this.validation_rules.allow_manual_override && isNearby);
     reason = isNearby ? 'Near but outside geo-fence' : 'Outside geo-fence';
   } else if (!accuracyValid) {
     requiresApproval = true;
