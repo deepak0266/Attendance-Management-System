@@ -65,6 +65,18 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
       console.error('Failed to mark notification as read', error);
     }
   };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.is_read) {
+      await markAsRead(notification._id, notification.is_read);
+    }
+    
+    setShowNotifications(false);
+    
+    if (notification.data && notification.data.redirectUrl) {
+      navigate(notification.data.redirectUrl);
+    }
+  };
   
   const handleLogout = async () => {
     try {
@@ -154,7 +166,7 @@ const Header = ({ toggleTheme, theme, toggleSidebar }) => {
                       <div 
                         key={notification._id} 
                         className={`notification-item ${!notification.is_read ? 'unread' : ''}`}
-                        onClick={() => markAsRead(notification._id, notification.is_read)}
+                        onClick={() => handleNotificationClick(notification)}
                       >
                         <div className="notification-icon">
                           {getNotificationIcon(notification.type)}

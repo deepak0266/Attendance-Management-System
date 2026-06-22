@@ -42,14 +42,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/dashboard',
       icon: <FaHome />,
       label: 'Dashboard',
-      roles: ['SUPER_ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER', 'EMPLOYEE']
     },
     {
       key: 'attendance',
       path: '/attendance',
       icon: <FaClock />,
       label: 'Attendance',
-      roles: ['SUPER_ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'],
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER', 'EMPLOYEE'],
       children: [
         { path: '/attendance/punch', icon: <FaClock />, label: 'Punch In/Out' },
         { path: '/attendance/log', icon: <FaList />, label: 'Attendance Log' },
@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/approvals',
       icon: <FaCheckCircle />,
       label: 'Approvals',
-      roles: ['SUPER_ADMIN', 'HR', 'MANAGER'],
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'],
       badge: user?.pendingApprovals || 0,
       children: [
         { path: '/approvals/pending', icon: <FaClock />, label: 'Pending' },
@@ -75,12 +75,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/reports',
       icon: <FaChartBar />,
       label: 'Reports',
-      roles: ['SUPER_ADMIN', 'HR', 'MANAGER'],
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'],
       children: [
-        { path: '/reports/daily', icon: <FaCalendarDay />, label: 'Daily Report', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] },
-        { path: '/reports/monthly', icon: <FaCalendarAlt />, label: 'Monthly Report', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] },
-        { path: '/reports/overtime', icon: <FaClock />, label: 'Overtime Report', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] },
-        { path: '/reports/payroll', icon: <FaMoneyBill />, label: 'Payroll Report', roles: ['SUPER_ADMIN', 'HR'] }
+        { path: '/reports/daily', icon: <FaCalendarDay />, label: 'Daily Report', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] },
+        { path: '/reports/monthly', icon: <FaCalendarAlt />, label: 'Monthly Report', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] },
+        { path: '/reports/overtime', icon: <FaClock />, label: 'Overtime Report', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] },
+        { path: '/reports/payroll', icon: <FaMoneyBill />, label: 'Payroll Report', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] }
       ]
     },
     {
@@ -88,18 +88,18 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/admin',
       icon: <FaUsers />,
       label: 'Administration',
-      roles: ['SUPER_ADMIN', 'HR'],
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'],
       children: [
-        { path: '/admin/users', icon: <FaUsers />, label: 'Users', roles: ['SUPER_ADMIN', 'HR'] },
+        { path: '/admin/users', icon: <FaUsers />, label: 'Users', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
         { path: '/admin/roles', icon: <FaUserCog />, label: 'Roles', roles: ['SUPER_ADMIN'] },
-        { path: '/admin/shifts', icon: <FaClock />, label: 'Shifts', roles: ['SUPER_ADMIN', 'HR'] },
-        { path: '/admin/policies', icon: <FaCog />, label: 'Policies', roles: ['SUPER_ADMIN', 'HR'] },
-        { path: '/admin/geofence', icon: <FaMapMarkerAlt />, label: 'Geo-fence', roles: ['SUPER_ADMIN', 'HR'] },
+        { path: '/admin/shifts', icon: <FaClock />, label: 'Shifts', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+        { path: '/admin/policies', icon: <FaCog />, label: 'Policies', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+        { path: '/admin/geofence', icon: <FaMapMarkerAlt />, label: 'Geo-fence', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
         { path: '/admin/permissions', icon: <FaShieldAlt />, label: 'Permissions', roles: ['SUPER_ADMIN'] },
-        { path: '/admin/logs', icon: <FaHistory />, label: 'System Logs', roles: ['SUPER_ADMIN', 'HR'] },
-        { path: '/admin/device-approvals', icon: <FaCheckCircle />, label: 'Device Approvals', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] },
-        { path: '/admin/holiday-calendar', icon: <FaCalendarDay />, label: 'Holidays', roles: ['SUPER_ADMIN', 'HR'] },
-        { path: '/admin/qr-presenter', icon: <FaMapMarkerAlt />, label: 'QR Presenter', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] }
+        { path: '/admin/logs', icon: <FaHistory />, label: 'System Logs', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+        { path: '/admin/device-approvals', icon: <FaCheckCircle />, label: 'Device Approvals', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] },
+        { path: '/admin/holiday-calendar', icon: <FaCalendarDay />, label: 'Holidays', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+        { path: '/admin/qr-presenter', icon: <FaMapMarkerAlt />, label: 'QR Presenter', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] }
       ]
     },
     {
@@ -107,7 +107,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/profile',
       icon: <FaUserCog />,
       label: 'Profile',
-      roles: ['SUPER_ADMIN', 'HR', 'MANAGER', 'EMPLOYEE'],
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER', 'EMPLOYEE'],
       children: [
         { path: '/profile?tab=profile', matchPath: '/profile', icon: <FaUser />, label: 'Profile' },
         { path: '/profile?tab=security', matchPath: '/profile', icon: <FaLock />, label: 'Security' },
@@ -120,7 +120,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       path: '/notifications',
       icon: <FaBell />,
       label: 'Notifications',
-      roles: ['SUPER_ADMIN', 'HR', 'MANAGER', 'EMPLOYEE']
+      roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER', 'EMPLOYEE']
     }
   ];
 

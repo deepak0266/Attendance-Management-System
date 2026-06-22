@@ -27,16 +27,16 @@ const Admin = ({ toggleTheme, theme }) => {
   const closeSidebar = () => setSidebarOpen(false);
 
   const adminTabs = [
-    { path: '/admin/users', icon: <FaUsers />, label: 'Users', roles: ['SUPER_ADMIN', 'HR'] },
-    { path: '/admin/shifts', icon: <FaClock />, label: 'Shifts', roles: ['SUPER_ADMIN', 'HR'] },
-    { path: '/admin/policies', icon: <FaCog />, label: 'Policies', roles: ['SUPER_ADMIN', 'HR'] },
-    { path: '/admin/geofence', icon: <FaMapMarkerAlt />, label: 'Geo-fence', roles: ['SUPER_ADMIN', 'HR'] },
+    { path: '/admin/users', icon: <FaUsers />, label: 'Users', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+    { path: '/admin/shifts', icon: <FaClock />, label: 'Shifts', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+    { path: '/admin/policies', icon: <FaCog />, label: 'Policies', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+    { path: '/admin/geofence', icon: <FaMapMarkerAlt />, label: 'Geo-fence', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
     { path: '/admin/roles', icon: <FaShieldAlt />, label: 'Roles', roles: ['SUPER_ADMIN'] },
     { path: '/admin/permissions', icon: <FaShieldAlt />, label: 'Permissions', roles: ['SUPER_ADMIN'] },
-    { path: '/admin/logs', icon: <FaHistory />, label: 'System Logs', roles: ['SUPER_ADMIN', 'HR'] },
-    { path: '/admin/device-approvals', icon: <FaCheckCircle />, label: 'Device Approvals', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] },
-    { path: '/admin/holiday-calendar', icon: <FaCalendarDay />, label: 'Holidays', roles: ['SUPER_ADMIN', 'HR'] },
-    { path: '/admin/qr-presenter', icon: <FaMapMarkerAlt />, label: 'QR Presenter', roles: ['SUPER_ADMIN', 'HR', 'MANAGER'] }
+    { path: '/admin/logs', icon: <FaHistory />, label: 'System Logs', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+    { path: '/admin/device-approvals', icon: <FaCheckCircle />, label: 'Device Approvals', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] },
+    { path: '/admin/holiday-calendar', icon: <FaCalendarDay />, label: 'Holidays', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR'] },
+    { path: '/admin/qr-presenter', icon: <FaMapMarkerAlt />, label: 'QR Presenter', roles: ['SUPER_ADMIN', 'HR', 'HEAD_HR', 'MANAGER'] }
   ];
 
   const filteredTabs = adminTabs.filter(tab => tab.roles.includes(user?.role));

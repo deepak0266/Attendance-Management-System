@@ -203,6 +203,15 @@ export const apiService = {
     requestDeletion: (id) => api.post(`/roles/${id}/request-deletion`),
     getDeletionRequests: () => api.get('/roles/deletion-requests'),
     reviewDeletionRequest: (id, data) => api.post(`/roles/deletion-requests/${id}/review`, data)
+  },
+  
+  // Devices
+  device: {
+    request: (data) => api.post('/device/request', data),
+    getPending: () => api.get('/device/pending'),
+    approve: (id) => api.post(`/device/${id}/approve`),
+    reject: (id) => api.post(`/device/${id}/reject`),
+    getMyDevices: () => api.get('/device/my-devices')
   }
 };
 

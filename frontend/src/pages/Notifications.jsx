@@ -8,6 +8,7 @@ import { useAuth } from '../services/auth';
 import { apiService } from '../services/api';
 import { formatDateTime } from '../utils/helpers';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Notifications = ({ toggleTheme, theme }) => {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ const Notifications = ({ toggleTheme, theme }) => {
   const [filter, setFilter] = useState('all'); // all, unread
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
   const closeSidebar = () => setSidebarOpen(false);
@@ -62,6 +64,16 @@ const Notifications = ({ toggleTheme, theme }) => {
       setNotifications(prev => prev.map(n => n._id === id ? { ...n, is_read: true } : n));
     } catch (error) {
       console.error('Failed to mark as read', error);
+    }
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.is_read) {
+      await markAsRead(notification._id, notification.is_read);
+    }
+    
+    if (notification.data && notification.data.redirectUrl) {
+      navigate(notification.data.redirectUrl);
     }
   };
 
@@ -134,7 +146,7 @@ const Notifications = ({ toggleTheme, theme }) => {
                       <div 
                         key={notification._id} 
                         className={`notification-row ${!notification.is_read ? 'unread' : ''}`}
-                        onClick={() => markAsRead(notification._id, notification.is_read)}
+                        onClick={() => handleNotificationClick(notification)}
                         style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '15px', cursor: 'pointer', transition: 'background 0.2s', background: !notification.is_read ? 'color-mix(in srgb, #667eea 5%, transparent)' : 'transparent' }}
                       >
                         <div className="notification-icon" style={{ fontSize: '24px' }}>

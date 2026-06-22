@@ -237,11 +237,12 @@ const PunchInOut = ({ showGuidelines = false }) => {
     try {
       setLoading(true);
       const deviceId = localStorage.getItem('deviceId') || 'unknown';
-      await apiService.attendance.requestDeviceApproval({
+      await apiService.device.request({
         device_id: deviceId,
+        device_name: navigator.platform || 'Web Browser',
         platform: navigator.platform
       });
-      toast.success('Device approval request sent successfully!');
+      toast.success('Device approval request sent to your superiors!');
       setDeviceApprovalPrompt(false);
     } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to request device approval');
