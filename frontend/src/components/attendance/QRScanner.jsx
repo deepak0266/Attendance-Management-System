@@ -15,6 +15,7 @@ const QRScanner = () => {
   const [qrPayload, setQrPayload] = useState(null);
   const [location, setLocation] = useState(null);
   const [punchResult, setPunchResult] = useState(null);
+  const [punchError, setPunchError] = useState(null);
   const [currentState, setCurrentState] = useState('NOT_PUNCHED');
   const [loading, setLoading] = useState(false);
   const [requireSelfie, setRequireSelfie] = useState(false);
@@ -195,6 +196,7 @@ const QRScanner = () => {
     if (loading) return;
 
     setLoading(true);
+    setPunchError(null);
     try {
       const punchType = getNextPunchType();
       const deviceId = localStorage.getItem('device_id') || generateDeviceId();
@@ -229,9 +231,9 @@ const QRScanner = () => {
         toast.success(`Successfully punched ${punchType}!`);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to submit punch');
-      setQrPayload(null);
-      setSelfieSrc(null);
+      const errorMsg = error.response?.data?.error || 'Failed to submit punch';
+      toast.error(errorMsg);
+      setPunchError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -248,6 +250,7 @@ const QRScanner = () => {
     setQrPayload(null);
     setSelfieSrc(null);
     setPunchResult(null);
+    setPunchError(null);
   };
 
   // Loading state
@@ -401,10 +404,22 @@ const QRScanner = () => {
           )}
 
           {/* Auto-submitting or no selfie needed - show loading */}
-          {!requireSelfie && (
+          {!requireSelfie && !punchError && (
             <div className="auto-submit-notice">
               <FaSpinner className="fa-spin" size={24} />
               <p>Submitting punch...</p>
+            </div>
+          )}
+
+          {punchError && (
+            <div className="punch-error-notice" style={{ marginTop: '20px', textAlign: 'center' }}>
+              <p className="text-danger" style={{ marginBottom: '15px', fontWeight: 'bold' }}>{punchError}</p>
+              <button 
+                className="btn-scan-again secondary-btn"
+                onClick={handleScanAgain}
+              >
+                <FaRedo /> Try Again
+              </button>
             </div>
           )}
         </>

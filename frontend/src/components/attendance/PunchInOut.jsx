@@ -135,6 +135,8 @@ const PunchInOut = ({ showGuidelines = false }) => {
   };
 
   const handlePunch = async (type) => {
+    if (loading) return;
+
     if (!location) {
       toast.error('Location is required for attendance');
       await getLocation();
@@ -193,7 +195,8 @@ const PunchInOut = ({ showGuidelines = false }) => {
       setCapturedPhoto(null);
       await checkCurrentStatus();
     } catch (error) {
-      toast.error(error.message || 'Failed to record attendance');
+      // Error is already toasted by attendanceService
+      await checkCurrentStatus(); // Sync UI in case state is mismatched
     } finally {
       setLoading(false);
     }
