@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import { formatTime, formatDuration } from '../../utils/helpers';
+import { apiService } from '../../services/api';
 
 const PunchInOut = ({ showGuidelines = false }) => {
   const { user } = useAuth();
@@ -216,6 +217,7 @@ const PunchInOut = ({ showGuidelines = false }) => {
       } else if (error.response?.data?.error?.includes('Unregistered device')) {
         setDeviceApprovalPrompt(true);
       } else {
+        toast.error(error.response?.data?.error || 'Failed to record punch');
         await checkCurrentStatus(); // Sync UI in case state is mismatched
       }
     } finally {

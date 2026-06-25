@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Device = require('../models/Device');
 const User = require('../models/User');
-const { authMiddleware, authorize } = require('../middleware/auth');
+const { authMiddleware, authorize, checkPermission } = require('../middleware/auth');
 const notificationService = require('../services/notificationService');
 const logger = require('../utils/logger');
 
 // @route   POST /api/device/request
 // @desc    Request a new device registration (sends notifications up the hierarchy)
 // @access  Private (All authenticated)
-router.post('/request', async (req, res) => {
+router.post('/request', authMiddleware, async (req, res) => {
   try {
     const { device_id, device_name, platform } = req.body;
     
@@ -102,8 +102,7 @@ router.post('/request', async (req, res) => {
 
 // @route   GET /api/device/pending
 // @desc    Get pending device requests with full device history
-// @access  Private (HR, HEAD_HR, MANAGER, SUPER_ADMIN)
-router.get('/pending', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN'), async (req, res) => {
+router.get('/pending', authMiddleware, checkPermission('approve_requests'), async (req, res) => {
   try {
     const query = { status: 'PENDING' };
     
@@ -120,6 +119,14 @@ router.get('/pending', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN'), asy
     
     // For each pending request, attach the user's FULL device history
     const devicesWithHistory = await Promise.all(devices.map(async (device) => {
+      if (!device.user_id) {
+        return {
+          ...device.toObject(),
+          history: [],
+          managerInfo: null
+        };
+      }
+
       const history = await Device.find({ 
         user_id: device.user_id._id, 
         _id: { $ne: device._id } 
@@ -151,11 +158,14 @@ router.get('/pending', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN'), asy
 // @route   POST /api/device/:id/approve
 // @desc    Approve device registration and notify the employee
 // @access  Private (HR, HEAD_HR, MANAGER, SUPER_ADMIN)
-router.post('/:id/approve', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN'), async (req, res) => {
+router.post('/:id/approve', authMiddleware, checkPermission('approve_requests'), async (req, res) => {
   try {
     const device = await Device.findById(req.params.id).populate('user_id', 'full_name email employee_id');
     if (!device) {
       return res.status(404).json({ success: false, error: 'Device request not found' });
+    }
+    if (!device.user_id) {
+      return res.status(400).json({ success: false, error: 'User for this device no longer exists' });
     }
 
     if (device.status !== 'PENDING') {
@@ -195,11 +205,14 @@ router.post('/:id/approve', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN')
 // @route   POST /api/device/:id/reject
 // @desc    Reject device registration and notify the employee
 // @access  Private (HR, HEAD_HR, MANAGER, SUPER_ADMIN)
-router.post('/:id/reject', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN'), async (req, res) => {
+router.post('/:id/reject', authMiddleware, checkPermission('approve_requests'), async (req, res) => {
   try {
     const device = await Device.findById(req.params.id).populate('user_id', 'full_name email employee_id');
     if (!device) {
       return res.status(404).json({ success: false, error: 'Device request not found' });
+    }
+    if (!device.user_id) {
+      return res.status(400).json({ success: false, error: 'User for this device no longer exists' });
     }
 
     if (device.status !== 'PENDING') {
@@ -231,7 +244,7 @@ router.post('/:id/reject', authorize('HR', 'HEAD_HR', 'MANAGER', 'SUPER_ADMIN'),
 // @route   GET /api/device/my-devices
 // @desc    Get current user's devices
 // @access  Private
-router.get('/my-devices', async (req, res) => {
+router.get('/my-devices', authMiddleware, async (req, res) => {
   try {
     const devices = await Device.find({ user_id: req.user.id })
       .sort({ created_at: -1 })

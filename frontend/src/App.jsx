@@ -22,7 +22,7 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
-  
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -30,15 +30,15 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
       </div>
     );
   }
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
+
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
-  
+
   return children;
 };
 
@@ -46,7 +46,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
-  
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -54,12 +54,12 @@ const PublicRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   if (isAuthenticated) {
     const from = location.state?.from?.pathname || '/dashboard';
     return <Navigate to={from} replace />;
   }
-  
+
   return children;
 };
 
@@ -68,19 +68,20 @@ function AppContent() {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   });
-  
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
-  
+
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
-  
+  // backend/src/utils/validators.js
+  // frontend/src/utils/helpers.js
   return (
     <div className="app" data-theme={theme}>
-      <Toaster 
+      <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
@@ -103,7 +104,7 @@ function AppContent() {
           }
         }}
       />
-      
+
       <Suspense fallback={
         <div className="loading-screen">
           <LoadingSpinner size="large" />
@@ -116,38 +117,38 @@ function AppContent() {
               <Login />
             </PublicRoute>
           } />
-          
+
           {/* Protected Routes */}
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
               <Dashboard toggleTheme={toggleTheme} theme={theme} />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/attendance/*" element={
             <ProtectedRoute>
               <Attendance toggleTheme={toggleTheme} theme={theme} />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/approvals/*" element={
             <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'HR', 'MANAGER']}>
               <Approval toggleTheme={toggleTheme} theme={theme} />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/reports/*" element={
             <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'HR', 'MANAGER']}>
               <Reports toggleTheme={toggleTheme} theme={theme} />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/admin/*" element={
             <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'HR']}>
               <Admin toggleTheme={toggleTheme} theme={theme} />
             </ProtectedRoute>
           } />
-          
+
           <Route path="/profile/*" element={
             <ProtectedRoute>
               <Profile toggleTheme={toggleTheme} theme={theme} />
@@ -159,7 +160,7 @@ function AppContent() {
               <Notifications toggleTheme={toggleTheme} theme={theme} />
             </ProtectedRoute>
           } />
-          
+
           {/* Default Routes */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
