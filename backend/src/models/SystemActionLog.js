@@ -21,6 +21,10 @@ const systemActionLogSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
+      'PUNCH_IN',
+      'PUNCH_OUT',
+      'BREAK_START',
+      'BREAK_END',
       'PUNCH_EDIT',
       'ACCESS_REVOKE',
       'ACCESS_RESTORE',
