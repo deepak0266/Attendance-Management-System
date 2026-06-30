@@ -9,7 +9,7 @@ const logger = require('../utils/logger');
 // @route   POST /api/device/request
 // @desc    Request a new device registration (sends notifications up the hierarchy)
 // @access  Private (All authenticated)
-router.post('/request', authMiddleware, async (req, res) => {
+router.post('/request', async (req, res) => {
   try {
     const { device_id, device_name, platform } = req.body;
     
@@ -102,7 +102,7 @@ router.post('/request', authMiddleware, async (req, res) => {
 
 // @route   GET /api/device/pending
 // @desc    Get pending device requests with full device history
-router.get('/pending', authMiddleware, checkPermission('approve_requests'), async (req, res) => {
+router.get('/pending', checkPermission('approve_requests'), async (req, res) => {
   try {
     const query = { status: 'PENDING' };
     
@@ -158,7 +158,7 @@ router.get('/pending', authMiddleware, checkPermission('approve_requests'), asyn
 // @route   POST /api/device/:id/approve
 // @desc    Approve device registration and notify the employee
 // @access  Private (HR, HEAD_HR, MANAGER, SUPER_ADMIN)
-router.post('/:id/approve', authMiddleware, checkPermission('approve_requests'), async (req, res) => {
+router.post('/:id/approve', checkPermission('approve_requests'), async (req, res) => {
   try {
     const device = await Device.findById(req.params.id).populate('user_id', 'full_name email employee_id');
     if (!device) {
@@ -205,7 +205,7 @@ router.post('/:id/approve', authMiddleware, checkPermission('approve_requests'),
 // @route   POST /api/device/:id/reject
 // @desc    Reject device registration and notify the employee
 // @access  Private (HR, HEAD_HR, MANAGER, SUPER_ADMIN)
-router.post('/:id/reject', authMiddleware, checkPermission('approve_requests'), async (req, res) => {
+router.post('/:id/reject', checkPermission('approve_requests'), async (req, res) => {
   try {
     const device = await Device.findById(req.params.id).populate('user_id', 'full_name email employee_id');
     if (!device) {
@@ -244,7 +244,7 @@ router.post('/:id/reject', authMiddleware, checkPermission('approve_requests'), 
 // @route   GET /api/device/my-devices
 // @desc    Get current user's devices
 // @access  Private
-router.get('/my-devices', authMiddleware, async (req, res) => {
+router.get('/my-devices', async (req, res) => {
   try {
     const devices = await Device.find({ user_id: req.user.id })
       .sort({ created_at: -1 })

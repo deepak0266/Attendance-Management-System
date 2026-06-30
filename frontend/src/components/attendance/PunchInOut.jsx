@@ -189,9 +189,9 @@ const PunchInOut = ({ showGuidelines = false }) => {
         device_info: {
           userAgent: navigator.userAgent,
           platform: navigator.platform,
-          device_id: localStorage.getItem('deviceId') || (() => {
+          device_id: localStorage.getItem('device_id') || (() => {
             const id = uuidv4();
-            localStorage.setItem('deviceId', id);
+            localStorage.setItem('device_id', id);
             return id;
           })()
         }
@@ -238,7 +238,7 @@ const PunchInOut = ({ showGuidelines = false }) => {
   const requestDeviceApproval = async () => {
     try {
       setLoading(true);
-      const deviceId = localStorage.getItem('deviceId') || 'unknown';
+      const deviceId = localStorage.getItem('device_id') || 'unknown';
       await apiService.device.request({
         device_id: deviceId,
         device_name: navigator.platform || 'Web Browser',

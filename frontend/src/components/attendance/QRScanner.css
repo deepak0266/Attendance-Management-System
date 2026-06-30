@@ -306,6 +306,15 @@
   background: var(--border-color);
 }
 
+.primary-btn {
+  background: #667eea;
+  color: white;
+}
+
+.primary-btn:hover {
+  background: #5a6fd6;
+}
+
 .completed-notice {
   padding: 15px;
   background: color-mix(in srgb, #22c55e 10%, transparent);

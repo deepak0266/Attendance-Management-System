@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import Webcam from 'react-webcam';
-import api from '../../services/api';
+import api, { apiService } from '../../services/api';
 import { attendanceService } from '../../services/attendance';
 import toast from 'react-hot-toast';
-import { FaQrcode, FaCamera, FaCheckCircle, FaRedo, FaClock, FaSignInAlt, FaSignOutAlt, FaSpinner } from 'react-icons/fa';
+import { FaQrcode, FaCamera, FaCheckCircle, FaRedo, FaClock, FaSignInAlt, FaSignOutAlt, FaSpinner, FaMapMarkerAlt } from 'react-icons/fa';
 import moment from 'moment';
 import './QRScanner.css';
 
@@ -245,6 +245,44 @@ const QRScanner = () => {
     return newId;
   };
 
+  const retryGetLocation = () => {
+    if (navigator.geolocation) {
+      const toastId = toast.loading('Fetching location...');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          toast.dismiss(toastId);
+          setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy });
+          toast.success('Location updated!');
+        },
+        (err) => {
+          toast.dismiss(toastId);
+          toast.error('Location access denied or timed out. Please enable GPS.');
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    } else {
+      toast.error('Geolocation is not supported by this browser');
+    }
+  };
+
+  const requestDeviceApprovalFromScanner = async () => {
+    try {
+      setLoading(true);
+      const deviceId = localStorage.getItem('device_id') || generateDeviceId();
+      await apiService.device.request({
+        device_id: deviceId,
+        device_name: navigator.platform || 'Mobile Device',
+        platform: navigator.platform
+      });
+      toast.success('Device approval request sent to your superiors!');
+      handleScanAgain(); // Reset scanner
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to request device approval');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleScanAgain = () => {
     // Reset for next punch (e.g., punch out after punch in)
     setQrPayload(null);
@@ -404,16 +442,44 @@ const QRScanner = () => {
           )}
 
           {/* Auto-submitting or no selfie needed - show loading */}
-          {!requireSelfie && !punchError && (
+          {!requireSelfie && !punchError && location && (
             <div className="auto-submit-notice">
               <FaSpinner className="fa-spin" size={24} />
               <p>Submitting punch...</p>
             </div>
           )}
 
+          {!requireSelfie && !punchError && !location && (
+            <div className="location-missing-notice" style={{ marginTop: '20px', textAlign: 'center' }}>
+              <FaSpinner className="fa-spin" size={24} style={{ marginBottom: '10px' }} />
+              <p className="text-warning" style={{ marginBottom: '15px', fontWeight: 'bold' }}>
+                Waiting for GPS location...
+              </p>
+              <button 
+                className="btn-scan-again secondary-btn"
+                onClick={retryGetLocation}
+                style={{ display: 'inline-flex', width: 'auto', margin: '0 auto' }}
+              >
+                <FaMapMarkerAlt /> Retry GPS Location
+              </button>
+            </div>
+          )}
+
           {punchError && (
             <div className="punch-error-notice" style={{ marginTop: '20px', textAlign: 'center' }}>
               <p className="text-danger" style={{ marginBottom: '15px', fontWeight: 'bold' }}>{punchError}</p>
+              
+              {punchError.includes('Unregistered device') && (
+                <button 
+                  className="btn-scan-again primary-btn"
+                  onClick={requestDeviceApprovalFromScanner}
+                  disabled={loading}
+                  style={{ marginBottom: '10px', display: 'inline-flex', width: 'auto', margin: '0 auto 10px auto' }}
+                >
+                  {loading ? <FaSpinner className="fa-spin" /> : 'Request Device Approval'}
+                </button>
+              )}
+
               <button 
                 className="btn-scan-again secondary-btn"
                 onClick={handleScanAgain}
